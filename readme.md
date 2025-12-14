@@ -28,12 +28,6 @@ Aplikasi manajemen operasional (POS) dan CRM khusus untuk bisnis **Laundry Sepat
 
 ---
 
-## 📸 Screenshots
-
-*(Tempatkan screenshot aplikasi di sini nanti. Contoh: Dashboard, Halaman Analytics, dll)*
-
----
-
 ## 🚀 Cara Instalasi (Local Development)
 
 Ikuti langkah ini untuk menjalankan proyek di komputer lokal Anda:
@@ -86,7 +80,7 @@ soleclean-app/
 ├── media/              # Upload user (Foto sepatu sebelum/sesudah)
 ├── db.sqlite3          # Database lokal
 └── manage.py           # Command line utility
-
+bash
 
 
 👨‍💻 Author
