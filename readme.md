@@ -36,9 +36,8 @@ Ikuti langkah ini untuk menjalankan proyek di komputer lokal Anda:
 ```bash
 git clone [https://github.com/username-anda/soleclean-app.git](https://github.com/username-anda/soleclean-app.git)
 cd soleclean-app
-2. Buat Virtual Environment
-Bash
 
+2. Buat Virtual Environment
 # Windows
 python -m venv env
 env\Scripts\activate
@@ -46,30 +45,23 @@ env\Scripts\activate
 # Mac/Linux
 python3 -m venv env
 source env/bin/activate
-3. Install Dependencies
-Bash
 
+3. Install Depedencies
 pip install django django-cleanup pillow
-4. Setup Database & Static Files
-Bash
 
+4. Setup Database & Static Files
 python manage.py makemigrations
 python manage.py migrate
 python manage.py collectstatic
-5. Buat Akun Superuser (Admin)
-Bash
 
+5.Create Superuser ( Admin )
 python manage.py createsuperuser
 # Ikuti instruksi di layar (masukkan username & password)
-6. Jalankan Server
-Bash
 
+6. Jalankan Server
 python manage.py runserver
-Buka browser dan akses: http://127.0.0.1:8000/
 
 📂 Struktur Proyek
-Plaintext
-
 soleclean-app/
 ├── config/             # Konfigurasi utama Django
 ├── operasional/        # Aplikasi inti (Views, Models, Forms)
@@ -80,11 +72,9 @@ soleclean-app/
 ├── media/              # Upload user (Foto sepatu sebelum/sesudah)
 ├── db.sqlite3          # Database lokal
 └── manage.py           # Command line utility
-bash
-
 
 👨‍💻 Author
-Muhammad Athfal Aulia Putra S.Kom
+Muhammad Athfal Aulia Putra, S.Kom
 
 Owner of SoleClean & Mahakam Coffee Roastery
 
