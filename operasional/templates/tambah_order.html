@@ -1,0 +1,122 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto bg-white p-8 rounded-lg shadow-lg">
+    
+    {% if messages %}
+        {% for message in messages %}
+            <div class="p-4 mb-4 text-sm text-white rounded {% if message.tags == 'success' %}bg-green-500{% else %}bg-red-500{% endif %}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">📝 Input Order</h2>
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-6 bg-blue-50 p-4 rounded border border-blue-100">
+            <div class="flex justify-between items-center mb-4 border-b border-blue-200 pb-2">
+                <h3 class="font-bold text-blue-800">👤 Pilih Pelanggan</h3>
+                
+                <a href="{% url 'tambah_customer' %}" class="text-xs bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 font-bold">
+                    + Pelanggan Baru
+                </a>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-bold mb-2">Cari Nama / WA</label>
+                
+                <select name="customer_id" id="customerSelect" class="w-full border p-2 rounded bg-white h-12" required onchange="updateInfo()">
+                    <option value="" selected disabled>-- Klik untuk memilih --</option>
+                    {% for c in customers %}
+                        <option value="{{ c.id }}" data-wa="{{ c.whatsapp }}" data-alamat="{{ c.alamat|default:'-' }}">
+                            {{ c.nama }} — {{ c.whatsapp }}
+                        </option>
+                    {% empty %}
+                        <option value="" disabled>Belum ada data pelanggan</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div id="customerInfo" class="hidden bg-white p-4 rounded border border-blue-200 shadow-sm">
+                <p class="text-sm text-gray-500 mb-1">Detail Pelanggan Terpilih:</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="font-bold text-gray-700">WhatsApp:</p>
+                        <p id="infoWa" class="text-green-600 font-mono font-bold">-</p>
+                    </div>
+                    <div>
+                        <p class="font-bold text-gray-700">Alamat:</p>
+                        <p id="infoAlamat" class="text-gray-600">-</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-6 bg-gray-50 p-4 rounded border border-gray-200">
+            <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">
+                👟 Detail Sepatu
+            </h3>
+
+            <div class="grid grid-cols-2 gap-4">
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-1">Paket Service</label>
+                    {{ form_item.service }}
+                </div>
+                <div class="mb-4">
+                    <label class="block text-sm font-bold mb-1">Merk Sepatu</label>
+                    {{ form_item.merk_sepatu }}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Warna</label>
+                {{ form_item.warna }}
+            </div>
+
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Foto Kondisi Awal (Wajib)</label>
+                {{ form_item.foto_sebelum }}
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Catatan</label>
+                {{ form_item.catatan }}
+            </div>
+        </div>
+
+        <button type="submit" class="w-full bg-blue-800 text-white font-bold py-3 px-4 rounded hover:bg-blue-900 transition duration-300 shadow-lg">
+            SIMPAN ORDER
+        </button>
+    </form>
+</div>
+
+<script>
+    function updateInfo() {
+        var select = document.getElementById("customerSelect");
+        var infoBox = document.getElementById("customerInfo");
+        var infoWa = document.getElementById("infoWa");
+        var infoAlamat = document.getElementById("infoAlamat");
+
+        // Ambil data dari opsi yang dipilih
+        var selectedOption = select.options[select.selectedIndex];
+
+        if (selectedOption.value) {
+            // Ambil text dari atribut data-wa & data-alamat
+            var wa = selectedOption.getAttribute("data-wa");
+            var alamat = selectedOption.getAttribute("data-alamat");
+
+            // Tempel ke HTML
+            infoWa.innerText = wa;
+            infoAlamat.innerText = alamat;
+
+            // Munculkan kotaknya (Hapus class hidden)
+            infoBox.classList.remove("hidden");
+        } else {
+            infoBox.classList.add("hidden");
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-2xl font-bold text-gray-800">📊 Laporan Keuangan</h2>
+        <a href="{% url 'dashboard' %}" class="text-blue-600 hover:underline">← Kembali ke Operasional</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        
+        <div class="bg-green-600 rounded-lg shadow-lg p-6 text-white">
+            <h3 class="text-xs font-bold opacity-80 uppercase tracking-wider">Cuan Masuk (Hari Ini)</h3>
+            <p class="text-4xl font-bold mt-2">Rp {{ omzet_harian|intcomma }}</p>
+            <p class="text-xs mt-2 opacity-80">Real Cash (Sudah Lunas)</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-blue-500">
+            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Total Bulan Ini</h3>
+            <p class="text-3xl font-bold text-gray-800 mt-2">Rp {{ omzet_bulanan|intcomma }}</p>
+        </div>
+
+        <div class="bg-white rounded-lg shadow p-6 border-l-4 border-purple-500">
+            <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider">Performa Toko</h3>
+            <div class="flex items-end gap-2 mt-2">
+                <p class="text-3xl font-bold text-gray-800">{{ qty_selesai }}</p>
+                <span class="text-sm text-gray-500 mb-1 font-bold">Sepatu Selesai (Bulan Ini)</span>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bg-yellow-50 border border-yellow-200 p-4 rounded text-sm text-yellow-800">
+        💡 <strong>Info Akuntansi:</strong> Angka di atas hanya menghitung order dengan status 
+        <span class="font-bold bg-green-200 px-1 rounded text-green-800">COMPLETED</span> 
+        (Sudah Diambil & Bayar). Order yang masih dicuci (Pending/Ready) belum dihitung sebagai omzet.
+    </div>
+</div>
+{% endblock %}

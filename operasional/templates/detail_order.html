@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    
+    <a href="{% url 'dashboard' %}" class="text-blue-600 hover:underline mb-4 inline-block">← Kembali ke Dashboard</a>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-6 border-l-8 
+        {% if order.status == 'READY' %}border-green-500{% else %}border-yellow-500{% endif %}">
+        
+        <div class="flex justify-between items-start">
+            <div>
+                <div class="flex items-center gap-4">
+    <h1 class="text-3xl font-bold text-gray-800">Order #{{ order.id }}</h1>
+    
+    <a href="{% url 'cetak_struk' order.id %}" target="_blank" class="bg-gray-800 text-white text-sm px-3 py-1 rounded hover:bg-black">
+        🖨️ Print Struk
+    </a>
+</div>
+                <p class="text-xl text-gray-600 mt-1">{{ order.customer.nama }}</p>
+                <a href="https://wa.me/{{ order.whatsapp }}" target="_blank" class="text-green-600 font-bold mt-2 inline-block">
+                    📲 {{ order.customer.whatsapp }}
+                </a>
+            </div>
+            
+            <form method="POST" class="bg-gray-100 p-3 rounded">
+                {% csrf_token %}
+                <label class="block text-xs font-bold text-gray-500 mb-1">UPDATE STATUS</label>
+                <select name="status" class="border p-2 rounded" onchange="this.form.submit()">
+                    <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Baru Masuk</option>
+                    <option value="PROCESS" {% if order.status == 'PROCESS' %}selected{% endif %}>Sedang Dikerjakan</option>
+                    <option value="READY" {% if order.status == 'READY' %}selected{% endif %}>Selesai / Siap Ambil</option>
+                    <option value="COMPLETED" {% if order.status == 'COMPLETED' %}selected{% endif %}>Sudah Diambil (Arsip)</option>
+                </select>
+            </form>
+        </div>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+        <h3 class="text-xl font-bold mb-4 border-b pb-2">Detail Pengerjaan</h3>
+        
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            {% for item in order.items.all %}
+            <div class="flex flex-col md:flex-row gap-6 mb-8 border-b pb-6 last:border-0">
+                
+                <div class="w-full md:w-1/2">
+                    <h4 class="font-bold text-lg">{{ item.merk_sepatu }}</h4>
+                    <p class="text-sm text-gray-500">{{ item.service.nama }} | {{ item.warna }}</p>
+                    <p class="text-sm text-red-500 mt-1">Note: {{ item.catatan|default:"-" }}</p>
+                    
+                    <div class="mt-3">
+                        <p class="text-xs font-bold mb-1">Kondisi Awal:</p>
+                        {% if item.foto_sebelum %}
+                            <img src="{{ item.foto_sebelum.url }}" class="h-32 rounded object-cover border">
+                        {% else %}
+                            <span class="text-gray-400 text-sm">Tidak ada foto</span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="w-full md:w-1/2 bg-gray-50 p-4 rounded">
+                    <p class="text-xs font-bold mb-2">HASIL CUCI (AFTER):</p>
+                    
+                    {% if item.foto_sesudah %}
+                        <img src="{{ item.foto_sesudah.url }}" class="h-40 rounded object-cover border mb-2">
+                        <p class="text-green-600 text-sm font-bold">✅ Foto After tersimpan</p>
+                    {% else %}
+                        <p class="text-gray-500 text-sm mb-2">Belum ada foto hasil.</p>
+                    {% endif %}
+
+                    <div class="mt-2">
+                        <input type="file" name="foto_after_{{ item.id }}" class="text-sm w-full">
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="text-right">
+                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">
+                    💾 Simpan Foto After
+                </button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+# .gitignore
+
+# 1. Folder Virtual Environment (BERAT BANGET, JANGAN DIUPLOAD)
+env/
+venv/
+.env
+
+# 2. Database Lokal (Isi data Rizal/Putra jangan diupload biar gak bentrok)
+db.sqlite3
+
+# 3. Sampah Python (Cache otomatis)
+__pycache__/
+*.pyc
+
+# 4. Folder Media (Foto sepatu hasil upload)
+# Opsional: Biasanya foto customer gak ditaruh di GitHub karena privasi & berat
+media/

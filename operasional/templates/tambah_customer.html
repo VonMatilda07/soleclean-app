@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-10">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">👤 Daftar Pelanggan Baru</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2">Nama Lengkap</label>
+            {{ form.nama }}
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2">WhatsApp (Unik)</label>
+            {{ form.whatsapp }}
+            <p class="text-xs text-red-500 mt-1">{{ form.whatsapp.errors }}</p>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-gray-700 font-bold mb-2">Alamat</label>
+            {{ form.alamat }}
+        </div>
+
+        <div class="flex gap-4 mt-6">
+            <a href="{% url 'tambah_order' %}" class="w-1/2 block text-center border border-gray-300 text-gray-700 font-bold py-3 px-4 rounded hover:bg-gray-50">
+                Batal
+            </a>
+            <button type="submit" class="w-1/2 bg-blue-800 text-white font-bold py-3 px-4 rounded hover:bg-blue-900">
+                Simpan Pelanggan
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
