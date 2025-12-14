@@ -86,6 +86,9 @@ soleclean-app/
 ├── media/              # Upload user (Foto sepatu sebelum/sesudah)
 ├── db.sqlite3          # Database lokal
 └── manage.py           # Command line utility
+
+
+
 👨‍💻 Author
 Muhammad Athfal Aulia Putra S.Kom
 
