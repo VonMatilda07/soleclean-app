@@ -34,7 +34,7 @@ Ikuti langkah ini untuk menjalankan proyek di komputer lokal Anda:
 
 ### 1. Clone Repository
 ```bash
-git clone [https://github.com/username-anda/soleclean-app.git](https://github.com/username-anda/soleclean-app.git)
+git clone [https://github.com/username-anda/soleclean-app.git](https://github.com/VonMatilda07/soleclean-app.git)
 cd soleclean-app
 
 2. Buat Virtual Environment
