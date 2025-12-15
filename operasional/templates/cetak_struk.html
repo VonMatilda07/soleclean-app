@@ -5,9 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Struk #{{ order.id }}</title>
     <style>
-        * {
-            box-sizing: border-box; /* Kunci biar padding gak bikin meluber */
-        }
+        * { box-sizing: border-box; }
         body {
             font-family: 'Courier New', Courier, monospace;
             font-size: 12px;
@@ -16,13 +14,12 @@
             background-color: #fff;
         }
         
-        /* Container Struk */
         .struk-wrapper {
             width: 100%;
-            max-width: 300px; /* Batas lebar maksimal biar mirip struk */
-            margin: 0 auto;   /* Posisi tengah */
+            max-width: 300px; /* Lebar Thermal Printer */
+            margin: 0 auto;
             padding: 10px;
-            border: 1px solid #eee; /* Garis tipis buat preview di layar */
+            border: 1px solid #eee;
         }
 
         .header { text-align: center; border-bottom: 2px dashed #000; padding-bottom: 10px; margin-bottom: 10px; }
@@ -35,16 +32,12 @@
         .items th { text-align: left; border-bottom: 1px solid #000; padding: 5px 0; }
         .items td { padding: 5px 0; vertical-align: top; }
         
-        /* Kolom Harga Rata Kanan & Gak Boleh Patah Baris */
         .col-harga { 
             text-align: right; 
             white-space: nowrap; 
-            width: 35%; /* Kasih jatah lebar pas */
+            width: 35%; 
         }
-        .col-item {
-            width: 65%;
-            padding-right: 5px;
-        }
+        .col-item { width: 65%; padding-right: 5px; }
 
         .total { 
             font-weight: bold; 
@@ -53,8 +46,13 @@
             border-top: 1px solid #000; 
             padding-top: 5px; 
         }
+        
+        .qr-area {
+            text-align: center;
+            margin-top: 15px;
+            margin-bottom: 5px;
+        }
 
-        /* Tombol Print */
         .btn-print {
             display: block;
             width: 100%;
@@ -69,16 +67,9 @@
             font-weight: bold;
         }
 
-        /* Mode Print / Save PDF */
         @media print {
             .btn-print { display: none; }
-            .struk-wrapper {
-                border: none; /* Hilangkan garis pinggir pas diprint */
-                max-width: 100%; /* Gunakan lebar kertas penuh */
-                width: 100%;
-                margin: 0;
-                padding: 0;
-            }
+            .struk-wrapper { border: none; max-width: 100%; width: 100%; margin: 0; padding: 0; }
             body { margin: 0; padding: 0; }
         }
     </style>
@@ -124,6 +115,11 @@
 
         <div class="total">
             TOTAL: Rp {{ total_hitung|floatformat:0 }}
+        </div>
+
+        <div class="qr-area">
+            <img src="data:image/png;base64,{{ qr_code }}" width="100" style="display: block; margin: 0 auto;">
+            <small style="font-size: 9px; color: #666;">Scan untuk Cek Status</small>
         </div>
 
         <div class="footer">

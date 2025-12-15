@@ -11,11 +11,12 @@
         {% endfor %}
     {% endif %}
 
-    <h2 class="text-2xl font-bold mb-6 text-gray-800">📝 Input Order</h2>
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">📝 Input Order (Multi-Item)</h2>
 
-    <form method="POST" enctype="multipart/form-data">
+    <form method="POST" enctype="multipart/form-data" id="orderForm">
         {% csrf_token %}
 
+        <!-- SECTION 1: PILIH PELANGGAN -->
         <div class="mb-6 bg-blue-50 p-4 rounded border border-blue-100">
             <div class="flex justify-between items-center mb-4 border-b border-blue-200 pb-2">
                 <h3 class="font-bold text-blue-800">👤 Pilih Pelanggan</h3>
@@ -55,68 +56,189 @@
             </div>
         </div>
 
-        <div class="mb-6 bg-gray-50 p-4 rounded border border-gray-200">
-            <h3 class="font-bold text-gray-800 mb-4 border-b border-gray-200 pb-2">
-                👟 Detail Sepatu
-            </h3>
-
-            <div class="grid grid-cols-2 gap-4">
-                <div class="mb-4">
-                    <label class="block text-sm font-bold mb-1">Paket Service</label>
-                    {{ form_item.service }}
-                </div>
-                <div class="mb-4">
-                    <label class="block text-sm font-bold mb-1">Merk Sepatu</label>
-                    {{ form_item.merk_sepatu }}
-                </div>
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Warna</label>
-                {{ form_item.warna }}
-            </div>
-
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Foto Kondisi Awal (Wajib)</label>
-                {{ form_item.foto_sebelum }}
-            </div>
-            
-            <div class="mb-4">
-                <label class="block text-sm font-bold mb-1">Catatan</label>
-                {{ form_item.catatan }}
-            </div>
+        <!-- SECTION 2: MULTIPLE ITEMS -->
+        <div id="itemsContainer" class="mb-6">
+            <!-- Item 1 akan di-generate oleh JavaScript -->
         </div>
 
+        <!-- BUTTON TAMBAH SEPATU -->
+        <button type="button" id="addItemBtn" class="mb-6 w-full bg-green-600 text-white font-bold py-2 px-4 rounded hover:bg-green-700 transition">
+            + TAMBAH SEPATU LAINNYA
+        </button>
+
+        <!-- SUBMIT -->
         <button type="submit" class="w-full bg-blue-800 text-white font-bold py-3 px-4 rounded hover:bg-blue-900 transition duration-300 shadow-lg">
-            SIMPAN ORDER
+            ✅ SIMPAN ORDER
         </button>
     </form>
 </div>
 
+<!-- TEMPLATE FORM ITEM (Hidden) -->
+<template id="itemTemplate">
+    <div class="mb-6 bg-gray-50 p-4 rounded border border-gray-200 item-form" data-item-index="0">
+        <div class="flex justify-between items-center mb-4 border-b border-gray-300 pb-2">
+            <h3 class="font-bold text-gray-800">👟 Sepatu #<span class="item-number">1</span></h3>
+            <button type="button" class="bg-red-500 text-white px-3 py-1 rounded text-sm hover:bg-red-600 removeItemBtn">
+                Hapus
+            </button>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Paket Service <span class="text-red-500">*</span></label>
+                <select name="orderitem_set-0-service" class="w-full border p-2 rounded bg-white service-select" required>
+                    <option value="">-- Pilih --</option>
+                    {% for service in services %}
+                        <option value="{{ service.id }}">{{ service.nama }} - Rp {{ service.harga }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-bold mb-1">Merk Sepatu</label>
+                <input type="text" name="orderitem_set-0-merk_sepatu" placeholder="Contoh: Nike Air Jordan" class="w-full border p-2 rounded merk-input">
+            </div>
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-bold mb-1">Warna</label>
+            <input type="text" name="orderitem_set-0-warna" placeholder="Contoh: Putih" class="w-full border p-2 rounded warna-input">
+        </div>
+
+        <div class="mb-4">
+            <label class="block text-sm font-bold mb-1">Foto Kondisi Awal <span class="text-red-500">*</span></label>
+            <input type="file" name="orderitem_set-0-foto_sebelum" accept="image/*" class="w-full text-sm text-gray-500 foto-input border p-2 rounded" required>
+            <small class="text-gray-500">File wajib dipilih untuk setiap sepatu</small>
+        </div>
+        
+        <div class="mb-4">
+            <label class="block text-sm font-bold mb-1">Catatan</label>
+            <textarea name="orderitem_set-0-catatan" placeholder="Catatan khusus..." rows="2" class="w-full border p-2 rounded catatan-input"></textarea>
+        </div>
+
+        <input type="hidden" name="orderitem_set-0-DELETE" value="0" class="delete-flag">
+    </div>
+</template>
+
 <script>
+    const itemTemplate = document.getElementById('itemTemplate');
+    const itemsContainer = document.getElementById('itemsContainer');
+    const addItemBtn = document.getElementById('addItemBtn');
+    const orderForm = document.getElementById('orderForm');
+    let itemCount = 0;
+
+    // FUNCTION: Tambah item baru
+    function addItem() {
+        const clone = itemTemplate.content.cloneNode(true);
+        itemCount++;
+        
+        // Update index di semua input
+        const inputs = clone.querySelectorAll('input, select, textarea');
+        inputs.forEach(input => {
+            // Update name attribute
+            let name = input.getAttribute('name');
+            if (name) {
+                input.setAttribute('name', name.replace(/-0-/, `-${itemCount}-`));
+            }
+            
+            // Clear value untuk fresh input
+            if (input.type === 'file') {
+                input.value = '';  // Reset file input
+            } else if (input.type !== 'hidden') {
+                input.value = '';  // Reset other inputs
+            }
+        });
+        
+        // Update nomor item
+        clone.querySelector('.item-number').textContent = itemCount + 1;
+        
+        // Update data-item-index
+        const itemDiv = clone.querySelector('.item-form');
+        itemDiv.setAttribute('data-item-index', itemCount);
+        
+        // Add remove button listener
+        clone.querySelector('.removeItemBtn').addEventListener('click', (e) => {
+            e.preventDefault();
+            const form = e.target.closest('.item-form');
+            form.remove();
+            updateItemNumbers();
+        });
+
+        itemsContainer.appendChild(clone);
+    }
+
+    // FUNCTION: Update nomor item setelah ada yang dihapus
+    function updateItemNumbers() {
+        const items = document.querySelectorAll('.item-form');
+        items.forEach((item, index) => {
+            item.querySelector('.item-number').textContent = index + 1;
+        });
+    }
+
+    // ADD ITEM BUTTON LISTENER
+    addItemBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        addItem();
+    });
+
+    // Load initial item
+    document.addEventListener('DOMContentLoaded', () => {
+        addItem();
+    });
+
+    // Customer info function
     function updateInfo() {
         var select = document.getElementById("customerSelect");
         var infoBox = document.getElementById("customerInfo");
         var infoWa = document.getElementById("infoWa");
         var infoAlamat = document.getElementById("infoAlamat");
 
-        // Ambil data dari opsi yang dipilih
         var selectedOption = select.options[select.selectedIndex];
 
         if (selectedOption.value) {
-            // Ambil text dari atribut data-wa & data-alamat
             var wa = selectedOption.getAttribute("data-wa");
             var alamat = selectedOption.getAttribute("data-alamat");
 
-            // Tempel ke HTML
             infoWa.innerText = wa;
             infoAlamat.innerText = alamat;
 
-            // Munculkan kotaknya (Hapus class hidden)
             infoBox.classList.remove("hidden");
         } else {
             infoBox.classList.add("hidden");
         }
     }
+
+    // FORM VALIDATION sebelum submit
+    orderForm.addEventListener('submit', (e) => {
+        const items = document.querySelectorAll('.item-form');
+        let hasValidItem = false;
+        let missingPhotos = [];
+        
+        items.forEach((item, idx) => {
+            const serviceSelect = item.querySelector('select[name*="-service"]');
+            const fotoInput = item.querySelector('input[type="file"][name*="-foto_sebelum"]');
+            
+            if (serviceSelect && fotoInput) {
+                const hasService = serviceSelect.value.trim() !== '';
+                const hasFile = fotoInput.files && fotoInput.files.length > 0;
+                
+                console.log(`Item ${idx}: service=${hasService}, file=${hasFile}`);
+                
+                if (hasService && hasFile) {
+                    hasValidItem = true;
+                } else if (hasService && !hasFile) {
+                    missingPhotos.push(idx + 1);
+                }
+            }
+        });
+        
+        if (!hasValidItem) {
+            e.preventDefault();
+            if (missingPhotos.length > 0) {
+                alert(`⚠️ Sepatu #${missingPhotos.join(', #')} WAJIB ada foto!`);
+            } else {
+                alert('⚠️ Minimal tambah 1 sepatu dengan service dan foto!');
+            }
+        }
+    });
 </script>
 {% endblock %}

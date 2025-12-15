@@ -11,79 +11,159 @@
         <div class="flex justify-between items-start">
             <div>
                 <div class="flex items-center gap-4">
-    <h1 class="text-3xl font-bold text-gray-800">Order #{{ order.id }}</h1>
-    
-    <a href="{% url 'cetak_struk' order.id %}" target="_blank" class="bg-gray-800 text-white text-sm px-3 py-1 rounded hover:bg-black">
-        🖨️ Print Struk
-    </a>
-</div>
+                    <h1 class="text-3xl font-bold text-gray-800">Order #{{ order.id }}</h1>
+                    <a href="{% url 'cetak_struk' order.id %}" target="_blank" class="bg-gray-800 text-white text-sm px-3 py-1 rounded hover:bg-black">
+                        🖨️ Print Struk
+                    </a>
+                </div>
                 <p class="text-xl text-gray-600 mt-1">{{ order.customer.nama }}</p>
-                <a href="https://wa.me/{{ order.whatsapp }}" target="_blank" class="text-green-600 font-bold mt-2 inline-block">
+                <a href="https://wa.me/{{ order.customer.whatsapp }}" target="_blank" class="text-green-600 font-bold mt-2 inline-block">
                     📲 {{ order.customer.whatsapp }}
                 </a>
             </div>
-            
-            <form method="POST" class="bg-gray-100 p-3 rounded">
-                {% csrf_token %}
-                <label class="block text-xs font-bold text-gray-500 mb-1">UPDATE STATUS</label>
-                <select name="status" class="border p-2 rounded" onchange="this.form.submit()">
-                    <option value="PENDING" {% if order.status == 'PENDING' %}selected{% endif %}>Baru Masuk</option>
-                    <option value="PROCESS" {% if order.status == 'PROCESS' %}selected{% endif %}>Sedang Dikerjakan</option>
-                    <option value="READY" {% if order.status == 'READY' %}selected{% endif %}>Selesai / Siap Ambil</option>
-                    <option value="COMPLETED" {% if order.status == 'COMPLETED' %}selected{% endif %}>Sudah Diambil (Arsip)</option>
-                </select>
-            </form>
         </div>
     </div>
 
     <div class="bg-white p-6 rounded-lg shadow-md">
-        <h3 class="text-xl font-bold mb-4 border-b pb-2">Detail Pengerjaan</h3>
+        <h3 class="text-xl font-bold mb-4 border-b pb-2">Detail Pengerjaan (Per Sepatu)</h3>
         
         <form method="POST" enctype="multipart/form-data">
             {% csrf_token %}
             
             {% for item in order.items.all %}
-            <div class="flex flex-col md:flex-row gap-6 mb-8 border-b pb-6 last:border-0">
-                
-                <div class="w-full md:w-1/2">
-                    <h4 class="font-bold text-lg">{{ item.merk_sepatu }}</h4>
-                    <p class="text-sm text-gray-500">{{ item.service.nama }} | {{ item.warna }}</p>
-                    <p class="text-sm text-red-500 mt-1">Note: {{ item.catatan|default:"-" }}</p>
+        <div class="mb-8 border-b pb-6 last:border-0 bg-gray-50 p-4 rounded">
+            
+                <!-- STATUS PER ITEM -->
+                <div class="mb-4 flex justify-between items-start">
+                    <div>
+                        <h4 class="font-bold text-lg">👟 {{ item.merk_sepatu }}</h4>
+                        <p class="text-sm text-gray-600">{{ item.service.nama }} • {{ item.warna }}</p>
+                        <p class="text-xs text-gray-500 mt-1">Note: {{ item.catatan|default:"-" }}</p>
+                    </div>
                     
-                    <div class="mt-3">
-                        <p class="text-xs font-bold mb-1">Kondisi Awal:</p>
+                    <!-- STATUS DROPDOWN PER ITEM -->
+                    <select name="status_item_{{ item.id }}" class="border-2 p-2 rounded font-bold text-sm
+                        {% if item.status == 'PENDING' %}bg-red-100 border-red-300 text-red-700
+                        {% elif item.status == 'PROCESS' %}bg-yellow-100 border-yellow-300 text-yellow-700
+                        {% elif item.status == 'READY' %}bg-blue-100 border-blue-300 text-blue-700
+                        {% elif item.status == 'COMPLETED' %}bg-green-100 border-green-300 text-green-700
+                        {% endif %}" onchange="confirmStatusChange(this, '{{ item.merk_sepatu }}')">
+                        <option value="PENDING" {% if item.status == 'PENDING' %}selected{% endif %}>🔴 Baru Masuk</option>
+                        <option value="PROCESS" {% if item.status == 'PROCESS' %}selected{% endif %}>🟡 Sedang Dikerjakan</option>
+                        <option value="READY" {% if item.status == 'READY' %}selected{% endif %}>🔵 Siap Ambil</option>
+                        <option value="COMPLETED" {% if item.status == 'COMPLETED' %}selected{% endif %}>✅ Sudah Diambil</option>
+                    </select>
+                </div>
+
+                <!-- FOTO BEFORE & AFTER -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- BEFORE -->
+                    <div>
+                        <p class="text-xs font-bold mb-2 text-gray-700">Kondisi Awal:</p>
                         {% if item.foto_sebelum %}
-                            <img src="{{ item.foto_sebelum.url }}" class="h-32 rounded object-cover border">
+                            <img src="{{ item.foto_sebelum.url }}" class="h-40 rounded object-cover border">
                         {% else %}
                             <span class="text-gray-400 text-sm">Tidak ada foto</span>
                         {% endif %}
                     </div>
-                </div>
 
-                <div class="w-full md:w-1/2 bg-gray-50 p-4 rounded">
-                    <p class="text-xs font-bold mb-2">HASIL CUCI (AFTER):</p>
-                    
-                    {% if item.foto_sesudah %}
-                        <img src="{{ item.foto_sesudah.url }}" class="h-40 rounded object-cover border mb-2">
-                        <p class="text-green-600 text-sm font-bold">✅ Foto After tersimpan</p>
-                    {% else %}
-                        <p class="text-gray-500 text-sm mb-2">Belum ada foto hasil.</p>
-                    {% endif %}
-
-                    <div class="mt-2">
-                        <input type="file" name="foto_after_{{ item.id }}" class="text-sm w-full">
+                    <!-- AFTER -->
+                    <div class="bg-white p-3 rounded border-2 border-dashed border-gray-300">
+                        <p class="text-xs font-bold mb-2 text-gray-700">Hasil Cuci (After):</p>
+                        {% if item.foto_sesudah %}
+                            <img src="{{ item.foto_sesudah.url }}" class="h-40 rounded object-cover border mb-2">
+                            <p class="text-green-600 text-xs font-bold">✅ Foto tersimpan</p>
+                        {% else %}
+                            <p class="text-gray-500 text-xs mb-3">Belum ada foto hasil</p>
+                            <input type="file" name="foto_after_{{ item.id }}" accept="image/*" class="text-xs w-full mb-2 border p-1 rounded">
+                            <button type="submit" class="bg-blue-600 text-white text-xs px-3 py-1 rounded hover:bg-blue-700 w-full font-bold">
+                                💾 Upload Foto
+                            </button>
+                        {% endif %}
                     </div>
                 </div>
             </div>
             {% endfor %}
-
-            <div class="text-right">
-                <button type="submit" class="bg-blue-600 text-white px-6 py-2 rounded font-bold hover:bg-blue-700">
-                    💾 Simpan Foto After
+        </form> 
+        {% if order.status != 'COMPLETED' %}
+            <div class="mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex justify-between items-center">
+                <div>
+                    <h4 class="font-bold text-gray-800">Menunggu Pelunasan</h4>
+                    <p class="text-sm text-gray-600">Pastikan terima uang sebelum menyerahkan sepatu.</p>
+                </div>
+                <button type="button" 
+                        onclick="document.getElementById('modalPelunasan').classList.remove('hidden')" 
+                        class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded-lg shadow-lg flex items-center gap-2">
+                    ✅ Bayar & Ambil
                 </button>
             </div>
-        </form>
-    </div>
 
+            <div id="modalPelunasan" class="fixed inset-0 bg-gray-900 bg-opacity-50 hidden flex items-center justify-center z-50">
+                <div class="bg-white rounded-lg shadow-xl w-96 p-6 relative animate-bounce-in">
+                    
+                    <h3 class="text-xl font-bold mb-4 text-gray-800">Konfirmasi Pembayaran 💰</h3>
+                    <p class="text-gray-600 mb-4 text-sm">Sepatu diambil atas nama <strong>{{ order.customer.nama }}</strong>.</p>
+                    
+                    <form action="{% url 'lunasi_order' order.id %}" method="POST">
+                        {% csrf_token %}
+                        
+                        <div class="mb-4">
+                            <label class="block text-sm font-bold mb-2">Terima Uang Via:</label>
+                            <select name="metode_pembayaran" class="w-full p-3 border rounded bg-gray-50 font-bold text-gray-800 focus:outline-none focus:ring-2 focus:ring-green-500">
+                                <option value="CASH">💵 CASH (Tunai)</option>
+                                <option value="TRANSFER">💳 TRANSFER / QRIS</option>
+                            </select>
+                        </div>
+
+                        <div class="flex gap-3 mt-6">
+                            <button type="button" onclick="document.getElementById('modalPelunasan').classList.add('hidden')" 
+                                    class="flex-1 py-2 bg-gray-200 text-gray-800 rounded font-bold hover:bg-gray-300">
+                                Batal
+                            </button>
+                            <button type="submit" class="flex-1 py-2 bg-green-600 text-white rounded font-bold hover:bg-green-700 shadow">
+                                LUNAS 🚀
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+        {% else %}
+            <div class="mt-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <h4 class="font-bold text-green-800 flex items-center gap-2">
+                    ✅ LUNAS & DIAMBIL
+                </h4>
+                <p class="text-sm text-green-700 mt-1">
+                    Dibayar via: <strong>{{ order.get_metode_pembayaran_display }}</strong> 
+                    pada {{ order.tanggal_selesai|date:"d M Y, H:i" }}
+                </p>
+            </div>
+        {% endif %}
+        
+    </div>
 </div>
+
+<script>
+    // Confirmation sebelum ubah status
+    function confirmStatusChange(selectElement, itemName) {
+        const newStatus = selectElement.value;
+        const statusMap = {
+            'PENDING': '🔴 Baru Masuk',
+            'PROCESS': '🟡 Sedang Dikerjakan',
+            'READY': '🔵 Siap Ambil',
+            'COMPLETED': '✅ Sudah Diambil'
+        };
+        
+        const confirm = window.confirm(`Ubah status "${itemName}" menjadi "${statusMap[newStatus]}" ?`);
+        
+        if (confirm) {
+            // Submit form jika user confirm
+            selectElement.form.submit();
+        } else {
+            // Revert ke status lama jika user batal
+            selectElement.form.reset();
+            location.reload(); // Reload biar dropdown balik ke posisi awal
+        }
+    }
+</script>
 {% endblock %}

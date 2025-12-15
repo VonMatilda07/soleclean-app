@@ -15,7 +15,13 @@
         <div class="mb-4">
             <label class="block text-gray-700 font-bold mb-2">WhatsApp (Unik)</label>
             {{ form.whatsapp }}
-            <p class="text-xs text-red-500 mt-1">{{ form.whatsapp.errors }}</p>
+            {% if form.whatsapp.errors %}
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-3 mt-2 rounded">
+                    {% for error in form.whatsapp.errors %}
+                        <p class="font-semibold">{{ error }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
         </div>
 
         <div class="mb-4">
