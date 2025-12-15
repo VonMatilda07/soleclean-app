@@ -8,6 +8,24 @@
         <a href="{% url 'dashboard' %}" class="text-blue-600 hover:underline">← Kembali ke Dashboard</a>
     </div>
 
+    <!-- DATE RANGE FILTER -->
+    <div class="bg-white p-4 rounded-lg shadow mb-6 flex gap-2 flex-wrap">
+        <a href="?filter=all" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'all' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+            📊 Semua Data
+        </a>
+        <a href="?filter=today" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'today' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+            📅 Hari Ini
+        </a>
+        <a href="?filter=week" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'week' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+            📆 Minggu Ini
+        </a>
+        <a href="?filter=month" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'month' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+            📋 Bulan Ini
+        </a>
+        <span class="ml-auto text-sm text-gray-500 py-2">Filter: <strong>{{ filter_label }}</strong></span>
+    </div>
+
+    <!-- KPI CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
             <h3 class="text-gray-500 text-sm font-bold uppercase">Total Omzet (Masuk)</h3>
@@ -31,6 +49,45 @@
         </div>
     </div>
 
+    <!-- CHARTS & GRAPHS -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        
+        <!-- GROWTH CHART -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-bold mb-4">📈 Trend Omzet (Grafik)</h3>
+            <div style="position: relative; height: 300px;">
+                <canvas id="growthChart"></canvas>
+            </div>
+        </div>
+
+        <!-- BREAKDOWN PENGELUARAN PIE CHART -->
+        <div class="bg-white p-6 rounded-lg shadow">
+            <h3 class="text-lg font-bold mb-4">🥧 Breakdown Pengeluaran</h3>
+            <div style="position: relative; height: 300px;">
+                <canvas id="breakdownChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOP SERVICES -->
+    <div class="bg-white p-6 rounded-lg shadow mb-8">
+        <h3 class="text-lg font-bold mb-4">🏆 Top 5 Services (Paling Sering)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+            {% for service in top_services %}
+            <div class="bg-gradient-to-br from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200">
+                <p class="text-sm font-bold text-gray-700">{{ service.service__nama }}</p>
+                <p class="text-2xl font-bold text-blue-600 mt-2">{{ service.count }}x</p>
+                <p class="text-xs text-gray-600 mt-1">Rp {{ service.total_revenue|intcomma }}</p>
+            </div>
+            {% empty %}
+            <div class="text-center text-gray-400 col-span-5 py-4">
+                Belum ada data service
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- FORM & RIWAYAT -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
         <div class="bg-white p-6 rounded-lg shadow h-fit">
@@ -106,4 +163,167 @@
 
     </div>
 </div>
+
+<!-- CHART.JS LIBRARY (dengan fallback) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+    // DEBUG: Lihat data yang dikirim ke template
+    const dailyLabels = {{ daily_labels|safe }};
+    const dailyOmzet = {{ daily_omzet|safe }};
+    const kategoriLabels = {{ kategori_labels|safe }};
+    const kategoriValues = {{ kategori_values|safe }};
+    
+    console.log('=== CHART DATA DEBUG ===');
+    console.log('Daily Labels:', dailyLabels);
+    console.log('Daily Omzet:', dailyOmzet);
+    console.log('Kategori Labels:', kategoriLabels);
+    console.log('Kategori Values:', kategoriValues);
+    console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+    console.log('========================');
+</script>
+
+<!-- CHART.JS LIBRARY (dengan fallback) -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+<script>
+    // Tunggu DOM fully loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // CEK: Apakah Chart.js sudah load
+        if (typeof Chart === 'undefined') {
+            console.error('❌ Chart.js tidak ter-load! Cek koneksi internet');
+            return;
+        }
+        console.log('✅ Chart.js loaded');
+        
+        // GROWTH CHART (Line Chart)
+        const growthCanvas = document.getElementById('growthChart');
+        if (growthCanvas) {
+            const growthCtx = growthCanvas.getContext('2d');
+            try {
+                new Chart(growthCtx, {
+                    type: 'line',
+                    data: {
+                        labels: dailyLabels,
+                        datasets: [{
+                            label: 'Omzet Harian (Rp)',
+                            data: dailyOmzet,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#3b82f6',
+                            pointHoverRadius: 7,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                labels: { 
+                                    font: { size: 12, weight: 'bold' },
+                                    padding: 20,
+                                    boxWidth: 15
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                padding: 12,
+                                titleFont: { size: 12, weight: 'bold' },
+                                bodyFont: { size: 11 },
+                                callbacks: {
+                                    label: function(context) {
+                                        return 'Rp ' + context.parsed.y.toLocaleString('id-ID');
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0,0,0,0.05)',
+                                    drawBorder: true
+                                },
+                                ticks: {
+                                    font: { size: 11 },
+                                    callback: function(value) {
+                                        return 'Rp ' + (value/1000).toLocaleString('id-ID') + 'k';
+                                    }
+                                }
+                            },
+                            x: {
+                                grid: { display: false },
+                                ticks: { font: { size: 10 } }
+                            }
+                        }
+                    }
+                });
+                console.log('✅ Growth Chart rendered');
+            } catch(e) {
+                console.error('❌ Error rendering Growth Chart:', e);
+            }
+        }
+
+        // BREAKDOWN PIE CHART
+        const breakdownCanvas = document.getElementById('breakdownChart');
+        if (breakdownCanvas) {
+            const breakdownCtx = breakdownCanvas.getContext('2d');
+            const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#6366f1', '#ec4899', '#a855f7'];
+            
+            try {
+                new Chart(breakdownCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: kategoriLabels,
+                        datasets: [{
+                            data: kategoriValues,
+                            backgroundColor: colors.slice(0, kategoriLabels.length),
+                            borderColor: '#fff',
+                            borderWidth: 3,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: { 
+                                    font: { size: 11, weight: 'bold' },
+                                    padding: 20,
+                                    boxWidth: 12,
+                                    usePointStyle: true
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0,0,0,0.8)',
+                                padding: 12,
+                                titleFont: { size: 12, weight: 'bold' },
+                                bodyFont: { size: 11 },
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = 'Rp ' + context.parsed.toLocaleString('id-ID');
+                                        return label + ': ' + value;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+                console.log('✅ Breakdown Chart rendered');
+            } catch(e) {
+                console.error('❌ Error rendering Breakdown Chart:', e);
+            }
+        }
+    });
+</script>
 {% endblock %}
