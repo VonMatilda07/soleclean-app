@@ -1,0 +1,123 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - SoleClean Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gradient-to-br from-blue-600 to-blue-800 min-h-screen flex items-center justify-center font-sans">
+
+    <div class="w-full max-w-md">
+        <!-- Card -->
+        <div class="bg-white rounded-lg shadow-2xl p-8">
+            
+            <!-- Logo & Title -->
+            <div class="text-center mb-8">
+                <div class="flex justify-center mb-4">
+                    <img src="{% static 'img/logo.png' %}" alt="Logo" class="h-20 w-auto object-contain">
+                </div>
+                <h1 class="text-3xl font-bold text-gray-800">SOLECLEAN</h1>
+                <p class="text-gray-500 mt-2">Sistem Manajemen Laundry Sepatu</p>
+            </div>
+
+            <!-- Login Form -->
+            <form method="post" class="space-y-6">
+                {% csrf_token %}
+                
+                <!-- Error Messages -->
+                {% if form.non_field_errors %}
+                    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg" role="alert">
+                        {% for error in form.non_field_errors %}
+                            <p class="font-medium">{{ error }}</p>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Username Field -->
+                <div>
+                    <label for="id_username" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Username
+                    </label>
+                    <input 
+                        type="text" 
+                        id="id_username" 
+                        name="username" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        placeholder="Masukkan username"
+                        required
+                    >
+                    {% if form.username.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.username.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Password Field -->
+                <div>
+                    <label for="id_password" class="block text-sm font-semibold text-gray-700 mb-2">
+                        Password
+                    </label>
+                    <input 
+                        type="password" 
+                        id="id_password" 
+                        name="password" 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition"
+                        placeholder="Masukkan password"
+                        required
+                    >
+                    {% if form.password.errors %}
+                        <p class="text-red-500 text-sm mt-1">{{ form.password.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <!-- Remember Me -->
+                <div class="flex items-center">
+                    <input 
+                        type="checkbox" 
+                        id="remember" 
+                        name="remember_me"
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded cursor-pointer"
+                    >
+                    <label for="remember" class="ml-2 block text-sm text-gray-700 cursor-pointer">
+                        Ingat saya di perangkat ini
+                    </label>
+                </div>
+
+                <!-- Login Button -->
+                <button 
+                    type="submit" 
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200 transform hover:scale-105"
+                >
+                    Login
+                </button>
+            </form>
+
+            <!-- Info Message -->
+            <div class="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm text-gray-600">
+                    <span class="font-semibold text-blue-700">ℹ️ Info:</span> Hubungi admin untuk mendapatkan akses
+                </p>
+            </div>
+
+            <!-- Demo Credentials (optional, remove in production) -->
+            {% if debug %}
+                <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <p class="text-xs text-gray-600 font-mono">
+                        <span class="font-semibold">Demo Credentials:</span><br>
+                        Username: admin<br>
+                        Password: [created via manage.py createsuperuser]
+                    </p>
+                </div>
+            {% endif %}
+
+        </div>
+
+        <!-- Footer -->
+        <div class="text-center mt-8 text-white text-sm">
+            <p>&copy; 2025 SoleClean Management. All rights reserved.</p>
+        </div>
+    </div>
+
+</body>
+</html>

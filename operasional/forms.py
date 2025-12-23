@@ -77,9 +77,10 @@ OrderItemFormSet = inlineformset_factory(
 class PengeluaranForm(forms.ModelForm):
     class Meta:
         model = Pengeluaran
-        fields = ['nama_pengeluaran', 'biaya', 'kategori', 'keterangan']
+        fields = ['nama_pengeluaran', 'sub_kategori', 'biaya', 'kategori', 'keterangan']
         widgets = {
             'nama_pengeluaran': forms.TextInput(attrs={'class': 'w-full p-2 border rounded', 'placeholder': 'Contoh: Beli Sabun'}),
+            'sub_kategori': forms.TextInput(attrs={'class': 'w-full p-2 border rounded', 'placeholder': 'Contoh: Sabun Putih, Cat Merah (opsional)'}),
             'biaya': forms.NumberInput(attrs={'class': 'w-full p-2 border rounded', 'placeholder': '0'}),
             'kategori': forms.Select(attrs={'class': 'w-full p-2 border rounded'}),
             'keterangan': forms.Textarea(attrs={'class': 'w-full p-2 border rounded', 'rows': 2}),

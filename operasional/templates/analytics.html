@@ -9,42 +9,59 @@
     </div>
 
     <!-- DATE RANGE FILTER -->
-    <div class="bg-white p-4 rounded-lg shadow mb-6 flex gap-2 flex-wrap">
-        <a href="?filter=all" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'all' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
-            📊 Semua Data
-        </a>
-        <a href="?filter=today" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'today' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
-            📅 Hari Ini
-        </a>
-        <a href="?filter=week" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'week' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
-            📆 Minggu Ini
-        </a>
-        <a href="?filter=month" class="px-3 py-2 rounded text-sm font-bold {% if filter_type == 'month' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
-            📋 Bulan Ini
-        </a>
-        <span class="ml-auto text-sm text-gray-500 py-2">Filter: <strong>{{ filter_label }}</strong></span>
+    <div class="bg-white p-4 rounded-lg shadow mb-6">
+        <div class="flex gap-2 flex-wrap mb-4">
+            <button type="button" data-filter="today" class="filter-btn px-3 py-2 rounded text-sm font-bold {% if filter_type == 'today' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                📅 Hari Ini
+            </button>
+            <button type="button" data-filter="week" class="filter-btn px-3 py-2 rounded text-sm font-bold {% if filter_type == 'week' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                📆 Minggu Ini
+            </button>
+            <button type="button" data-filter="month" class="filter-btn px-3 py-2 rounded text-sm font-bold {% if filter_type == 'month' %}bg-blue-600 text-white{% else %}bg-gray-200 text-gray-800 hover:bg-gray-300{% endif %}">
+                📋 Bulan Ini
+            </button>
+            <span class="ml-auto text-sm text-gray-500 py-2">Filter: <strong id="filterLabel">{{ filter_label }}</strong></span>
+        </div>
+        
+        <!-- CUSTOM DATE RANGE PICKER -->
+        <div class="border-t pt-4">
+            <form id="customDateForm" class="flex gap-2 items-end flex-wrap">
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">📌 Dari Tanggal</label>
+                    <input type="date" id="startDate" value="{{ display_start_date }}" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-gray-700 mb-1">📌 Sampai Tanggal</label>
+                    <input type="date" id="endDate" value="{{ display_end_date }}" class="px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                <button type="button" id="customFilterBtn" class="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700 transition">
+                    🔍 Tampilkan
+                </button>
+            </form>
+        </div>
     </div>
 
+    <!-- KPI CARDS -->
     <!-- KPI CARDS -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-lg shadow border-l-4 border-green-500">
             <h3 class="text-gray-500 text-sm font-bold uppercase">Total Omzet (Masuk)</h3>
-            <p class="text-2xl font-bold text-gray-800">Rp {{ total_omzet|intcomma }}</p>
+            <p class="text-2xl font-bold text-gray-800" id="kpiOmzet">Rp {{ total_omzet|intcomma }}</p>
             <div class="mt-2 text-xs text-gray-500">
-                <span class="block">💵 Cash di Laci: <span class="font-bold text-gray-700">Rp {{ duit_cash|intcomma }}</span></span>
-                <span class="block">💳 Transfer/QRIS: <span class="font-bold text-gray-700">Rp {{ duit_transfer|intcomma }}</span></span>
+                <span class="block">💵 Cash di Laci: <span class="font-bold text-gray-700" id="kpiCash">Rp {{ duit_cash|intcomma }}</span></span>
+                <span class="block">💳 Transfer/QRIS: <span class="font-bold text-gray-700" id="kpiTransfer">Rp {{ duit_transfer|intcomma }}</span></span>
             </div>
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow border-l-4 border-red-500">
             <h3 class="text-gray-500 text-sm font-bold uppercase">Total Pengeluaran (Keluar)</h3>
-            <p class="text-2xl font-bold text-red-600">- Rp {{ total_pengeluaran|intcomma }}</p>
+            <p class="text-2xl font-bold text-red-600" id="kpiExpense">- Rp {{ total_pengeluaran|intcomma }}</p>
             <p class="text-xs text-gray-400 mt-1">Gaji, Bahan, Operasional</p>
         </div>
 
         <div class="bg-white p-6 rounded-lg shadow border-l-4 border-blue-600">
             <h3 class="text-gray-500 text-sm font-bold uppercase">Laba Bersih (Net Profit)</h3>
-            <p class="text-3xl font-extrabold text-blue-700">Rp {{ laba_bersih|intcomma }}</p>
+            <p class="text-3xl font-extrabold text-blue-700" id="kpiProfit">Rp {{ laba_bersih|intcomma }}</p>
             <p class="text-xs text-green-600 mt-1 font-bold">Uang Dingin / Profit Bersih 😎</p>
         </div>
     </div>
@@ -87,6 +104,77 @@
         </div>
     </div>
 
+    <!-- DAILY BREAKDOWN TABLE -->
+    <div class="bg-white p-6 rounded-lg shadow mb-8">
+        <h3 class="text-lg font-bold mb-4">📅 Breakdown Harian (Hari per Hari)</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gradient-to-r from-blue-50 to-blue-100 text-gray-700 uppercase">
+                    <tr>
+                        <th class="px-4 py-3">Tanggal</th>
+                        <th class="px-4 py-3 text-center">Jumlah Item</th>
+                        <th class="px-4 py-3 text-right">Omzet (Rp)</th>
+                        <th class="px-4 py-3">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="dailyBreakdownBody">
+                    {% for day in daily_breakdown %}
+                    <tr class="border-b hover:bg-blue-50 transition daily-row {% if forloop.counter > 5 %}hidden-row{% endif %}" data-day-index="{{ forloop.counter }}">
+                        <td class="px-4 py-3 font-bold text-gray-800">{{ day.tanggal_format }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-bold">{{ day.item_count }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <span class="font-bold text-green-600 text-lg">Rp {{ day.omzet|intcomma }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            {% if day.omzet > 0 %}
+                                <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">✅ Ada Transaksi</span>
+                            {% else %}
+                                <span class="bg-gray-100 text-gray-500 px-3 py-1 rounded-full text-xs font-bold">⭕ Tutup</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-gray-400">
+                            Belum ada data untuk periode ini.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- EXPAND BUTTON -->
+        {% if daily_breakdown|length > 5 %}
+        <div class="mt-4 text-center">
+            <button id="expandDailyBtn" class="px-6 py-2 bg-blue-600 text-white rounded-lg font-bold hover:bg-blue-700 transition">
+                👇 Klik untuk melihat data lainnya ({{ daily_breakdown|length|add:"-5" }} hari lagi)
+            </button>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        document.getElementById('expandDailyBtn')?.addEventListener('click', function() {
+            const hiddenRows = document.querySelectorAll('.hidden-row');
+            const btn = document.getElementById('expandDailyBtn');
+            
+            if (btn.dataset.expanded === 'true') {
+                // Collapse
+                hiddenRows.forEach(row => row.style.display = 'none');
+                btn.textContent = '👇 Klik untuk melihat data lainnya (' + hiddenRows.length + ' hari lagi)';
+                btn.dataset.expanded = 'false';
+            } else {
+                // Expand
+                hiddenRows.forEach(row => row.style.display = 'table-row');
+                btn.textContent = '👆 Sembunyikan data lainnya';
+                btn.dataset.expanded = 'true';
+            }
+        });
+    </script>
+
     <!-- FORM & RIWAYAT -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
         
@@ -100,6 +188,11 @@
                 <div>
                     <label class="block text-sm font-bold mb-1 text-gray-700">Nama Pengeluaran</label>
                     {{ form_pengeluaran.nama_pengeluaran }}
+                </div>
+
+                <div>
+                    <label class="block text-sm font-bold mb-1 text-gray-700">Sub Kategori (Opsional)</label>
+                    {{ form_pengeluaran.sub_kategori }}
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -135,12 +228,17 @@
                             <th class="px-4 py-3 text-right">Biaya</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="expenseHistoryBody">
                         {% for expense in list_pengeluaran %}
                         <tr class="border-b hover:bg-gray-50">
                             <td class="px-4 py-3">{{ expense.tanggal|date:"d M" }}</td>
                             <td class="px-4 py-3">
                                 <div class="font-bold text-gray-800">{{ expense.nama_pengeluaran }}</div>
+                                {% if expense.sub_kategori %}
+                                    <span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold mr-1">
+                                        {{ expense.sub_kategori }}
+                                    </span>
+                                {% endif %}
                                 <span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">
                                     {{ expense.get_kategori_display }}
                                 </span>
@@ -162,47 +260,243 @@
         </div>
 
     </div>
+
+    <!-- TOP SUB-KATEGORI PENGELUARAN -->
+    <div class="bg-white p-6 rounded-lg shadow mb-8">
+        <h3 class="text-lg font-bold mb-4">🛍️ Daftar Pembelian Items (Per Sub-Kategori)</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-sm text-left">
+                <thead class="bg-gradient-to-r from-orange-50 to-orange-100 text-gray-700 uppercase">
+                    <tr>
+                        <th class="px-4 py-3">Sub-Kategori Item</th>
+                        <th class="px-4 py-3 text-center">Kali Beli</th>
+                        <th class="px-4 py-3 text-right">Total Biaya</th>
+                        <th class="px-4 py-3 text-right">Rata-rata/Item</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in sub_kategori_breakdown %}
+                    <tr class="border-b hover:bg-orange-50 transition">
+                        <td class="px-4 py-3 font-bold text-gray-800">{{ item.sub_kategori }}</td>
+                        <td class="px-4 py-3 text-center">
+                            <span class="bg-orange-100 text-orange-700 px-3 py-1 rounded-full font-bold">{{ item.count }}x</span>
+                        </td>
+                        <td class="px-4 py-3 text-right">
+                            <span class="font-bold text-red-600">Rp {{ item.total|intcomma }}</span>
+                        </td>
+                        <td class="px-4 py-3 text-right text-gray-600">
+                            Rp {{ item.average|intcomma }}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center py-8 text-gray-400">
+                            Belum ada sub-kategori yang tercatat.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
-<!-- CHART.JS LIBRARY (dengan fallback) -->
+<!-- CHART.JS LIBRARY -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 
 <script>
-    // DEBUG: Lihat data yang dikirim ke template
-    const dailyLabels = {{ daily_labels|safe }};
-    const dailyOmzet = {{ daily_omzet|safe }};
-    const kategoriLabels = {{ kategori_labels|safe }};
-    const kategoriValues = {{ kategori_values|safe }};
-    
-    console.log('=== CHART DATA DEBUG ===');
-    console.log('Daily Labels:', dailyLabels);
-    console.log('Daily Omzet:', dailyOmzet);
-    console.log('Kategori Labels:', kategoriLabels);
-    console.log('Kategori Values:', kategoriValues);
-    console.log('Chart.js loaded:', typeof Chart !== 'undefined');
-    console.log('========================');
-</script>
+    // Global chart instances untuk update
+    let growthChartInstance = null;
+    let breakdownChartInstance = null;
 
-<!-- CHART.JS LIBRARY (dengan fallback) -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    // Function untuk fetch data dari API
+    function loadAnalyticsData(filterType, startDate = null, endDate = null) {
+        let url = '/api/analytics/data/?filter=' + filterType;
+        if (filterType === 'custom' && startDate && endDate) {
+            url += '&start_date=' + startDate + '&end_date=' + endDate;
+        }
+        
+        console.log('📡 Fetching:', url);
+        
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok, status: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    console.log('✅ Data loaded:', data);
+                    
+                    // Update KPI Cards
+                    document.getElementById('kpiOmzet').textContent = 'Rp ' + data.kpi.total_omzet.toLocaleString('id-ID');
+                    document.getElementById('kpiCash').textContent = 'Rp ' + data.kpi.duit_cash.toLocaleString('id-ID');
+                    document.getElementById('kpiTransfer').textContent = 'Rp ' + data.kpi.duit_transfer.toLocaleString('id-ID');
+                    document.getElementById('kpiExpense').textContent = '- Rp ' + data.kpi.total_pengeluaran.toLocaleString('id-ID');
+                    document.getElementById('kpiProfit').textContent = 'Rp ' + data.kpi.laba_bersih.toLocaleString('id-ID');
+                    document.getElementById('filterLabel').textContent = filterType.charAt(0).toUpperCase() + filterType.slice(1);
+                    
+                    // Update Charts
+                    updateCharts(data.charts);
+                    
+                    // Update Expense History
+                    updateExpenseHistory(data.expense_history);
+                } else {
+                    console.error('❌ Error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('❌ Fetch error:', error);
+                alert('Error loading data: ' + error.message);
+            });
+    }
 
-<script>
-    // Tunggu DOM fully loaded
+    // Function untuk update expense history table
+    function updateExpenseHistory(expenses) {
+        const historyBody = document.getElementById('expenseHistoryBody');
+        if (!historyBody) return;
+        
+        if (!expenses || expenses.length === 0) {
+            historyBody.innerHTML = '<tr><td colspan="3" class="text-center py-8 text-gray-400">Belum ada pengeluaran tercatat.</td></tr>';
+            return;
+        }
+        
+        let html = '';
+        expenses.forEach(expense => {
+            let subKategoriHtml = expense.sub_kategori 
+                ? `<span class="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded font-bold mr-1">${expense.sub_kategori}</span>`
+                : '';
+            
+            html += `
+                <tr class="border-b hover:bg-gray-50">
+                    <td class="px-4 py-3">${expense.tanggal}</td>
+                    <td class="px-4 py-3">
+                        <div class="font-bold text-gray-800">${expense.nama}</div>
+                        ${subKategoriHtml}
+                        <span class="text-xs bg-gray-200 px-2 py-0.5 rounded text-gray-600">${expense.kategori_display}</span>
+                    </td>
+                    <td class="px-4 py-3 text-right text-red-600 font-bold">Rp ${expense.biaya.toLocaleString('id-ID')}</td>
+                </tr>
+            `;
+        });
+        
+        historyBody.innerHTML = html;
+        console.log('✅ Expense history updated');
+    }
+
+    // Function untuk update charts dengan data baru
+    function updateCharts(chartData) {
+        const growthCanvas = document.getElementById('growthChart');
+        const breakdownCanvas = document.getElementById('breakdownChart');
+        
+        // Update Growth Chart
+        if (growthChartInstance && growthCanvas) {
+            growthChartInstance.data.labels = chartData.daily_labels;
+            growthChartInstance.data.datasets[0].data = chartData.daily_omzet;
+            growthChartInstance.update();
+            console.log('✅ Growth chart updated');
+        }
+        
+        // Update Breakdown Chart
+        if (breakdownChartInstance && breakdownCanvas) {
+            breakdownChartInstance.data.labels = chartData.kategori_labels;
+            breakdownChartInstance.data.datasets[0].data = chartData.kategori_values;
+            breakdownChartInstance.update();
+            console.log('✅ Breakdown chart updated');
+        }
+    }
+
+    // eslint-disable-next-line no-undef
+    // Tunggu Chart.js load, then initialize charts
     document.addEventListener('DOMContentLoaded', function() {
+        // eslint-disable-next-line no-undef
+        const dailyLabels = {{ daily_labels|safe }};
+        const dailyOmzet = {{ daily_omzet|safe }};
+        const kategoriLabels = {{ kategori_labels|safe }};
+        const kategoriValues = {{ kategori_values|safe }};
+        
+        console.log('=== CHART DATA DEBUG ===');
+        console.log('Daily Labels:', dailyLabels);
+        console.log('Daily Omzet:', dailyOmzet);
+        console.log('Kategori Labels:', kategoriLabels);
+        console.log('Kategori Values:', kategoriValues);
+        console.log('Chart.js loaded:', typeof Chart !== 'undefined');
+        console.log('========================');
         
         // CEK: Apakah Chart.js sudah load
         if (typeof Chart === 'undefined') {
-            console.error('❌ Chart.js tidak ter-load! Cek koneksi internet');
+            console.error('❌ Chart.js tidak ter-load!');
             return;
         }
         console.log('✅ Chart.js loaded');
+        
+        // Setup filter button listeners
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const filterType = this.getAttribute('data-filter');
+                console.log('🔄 Filter clicked:', filterType);
+                this.disabled = true;
+                this.style.opacity = '0.6';
+                loadAnalyticsData(filterType);
+                
+                // Re-enable after request
+                setTimeout(() => {
+                    this.disabled = false;
+                    this.style.opacity = '1';
+                }, 1000);
+                
+                // Update button styles
+                document.querySelectorAll('.filter-btn').forEach(b => {
+                    b.classList.remove('bg-blue-600', 'text-white');
+                    b.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+                });
+                this.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+                this.classList.add('bg-blue-600', 'text-white');
+            });
+        });
+        
+        // Setup custom date filter
+        document.getElementById('customFilterBtn').addEventListener('click', function() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                alert('Silakan pilih kedua tanggal!');
+                return;
+            }
+            
+            console.log('🔄 Custom filter:', startDate, '-', endDate);
+            this.disabled = true;
+            this.style.opacity = '0.6';
+            loadAnalyticsData('custom', startDate, endDate);
+            
+            // Re-enable after request
+            setTimeout(() => {
+                this.disabled = false;
+                this.style.opacity = '1';
+            }, 1000);
+            
+            // Update button styles
+            document.querySelectorAll('.filter-btn').forEach(b => {
+                b.classList.remove('bg-blue-600', 'text-white');
+                b.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+            });
+        });
+        
         
         // GROWTH CHART (Line Chart)
         const growthCanvas = document.getElementById('growthChart');
         if (growthCanvas) {
             const growthCtx = growthCanvas.getContext('2d');
             try {
-                new Chart(growthCtx, {
+                growthChartInstance = new Chart(growthCtx, {
                     type: 'line',
                     data: {
                         labels: dailyLabels,
@@ -279,7 +573,7 @@
             const colors = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#06b6d4', '#6366f1', '#ec4899', '#a855f7'];
             
             try {
-                new Chart(breakdownCtx, {
+                breakdownChartInstance = new Chart(breakdownCtx, {
                     type: 'doughnut',
                     data: {
                         labels: kategoriLabels,

@@ -129,3 +129,15 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# ==========================================
+# AUTHENTICATION & SESSION SETTINGS
+# ==========================================
+LOGIN_URL = 'login'  # Redirect to login page when @login_required is triggered
+LOGIN_REDIRECT_URL = 'dashboard'  # Redirect after successful login
+LOGOUT_REDIRECT_URL = 'login'  # Redirect after logout
+
+# Session settings
+SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds (default)
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False  # Keep session even after browser close (unless remember_me unchecked)
+SESSION_COOKIE_SECURE = False  # Set to True in production (requires HTTPS)
+SESSION_COOKIE_HTTPONLY = True  # Prevent JavaScript access to session cookie

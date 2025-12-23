@@ -1,5 +1,24 @@
 from django.contrib import admin
-from .models import Customer, Service, Order, OrderItem
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
+from .models import Customer, Service, Order, OrderItem, Pengeluaran
+
+# ==========================================
+# USER MANAGEMENT (RBAC)
+# ==========================================
+class UserAdmin(BaseUserAdmin):
+    """Customized User Admin untuk manage roles/groups"""
+    list_display = ('username', 'email', 'first_name', 'last_name', 'get_groups', 'is_staff')
+    list_filter = ('is_staff', 'is_superuser', 'groups')
+    filter_horizontal = ('groups', 'user_permissions')
+    
+    @admin.display(description='Role')
+    def get_groups(self, obj):
+        return ', '.join([g.name for g in obj.groups.all()]) or 'No Role'
+
+# Unregister default User admin, register custom
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 
 # 1. Daftarin Customer biar bisa diedit manual
 @admin.register(Customer)
@@ -29,6 +48,13 @@ class OrderAdmin(admin.ModelAdmin):
     def get_customer_wa(self, obj):
         return obj.customer.whatsapp
 
-# 3. Sisanya Tetap
+# 3. Pengeluaran Admin
+@admin.register(Pengeluaran)
+class PengeluaranAdmin(admin.ModelAdmin):
+    list_display = ('tanggal', 'nama_pengeluaran', 'kategori', 'sub_kategori', 'biaya')
+    list_filter = ('tanggal', 'kategori')
+    search_fields = ('nama_pengeluaran', 'sub_kategori')
+
+# 4. Sisanya Tetap
 admin.site.register(Service)
 admin.site.register(OrderItem)

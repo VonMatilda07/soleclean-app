@@ -192,10 +192,13 @@ class Pengeluaran(models.Model):
     ]
 
     nama_pengeluaran = models.CharField(max_length=100)
+    sub_kategori = models.CharField(max_length=100, blank=True, null=True, help_text="e.g., Sabun, Cat Merah, Bensin, dll")
     biaya = models.DecimalField(max_digits=12, decimal_places=0)
     kategori = models.CharField(max_length=20, choices=KATEGORI_CHOICES, default='BAHAN')
     tanggal = models.DateTimeField(default=timezone.now)
     keterangan = models.TextField(blank=True, null=True)
 
     def __str__(self):
+        if self.sub_kategori:
+            return f"{self.nama_pengeluaran} ({self.sub_kategori}) - Rp {self.biaya}"
         return f"{self.nama_pengeluaran} - Rp {self.biaya}"

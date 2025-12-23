@@ -16,12 +16,35 @@
                 <h1 class="text-xl font-bold tracking-wider">SOLECLEAN</h1>
             </div>
 
-            <div class="flex gap-4 w-full md:w-auto justify-center md:justify-end items-center">
-                <a href="{% url 'dashboard' %}" class="hover:text-blue-200 py-2 font-medium">Dashboard</a>
-                <a href="{% url 'analytics' %}" class="hover:text-blue-200 py-2 font-medium">Keuangan</a>
-                <a href="{% url 'tambah_order' %}" class="bg-white text-blue-800 px-4 py-2 rounded font-bold hover:bg-gray-200 text-sm flex items-center shadow-sm">
-                    + Terima Order
-                </a>
+            <div class="flex gap-4 w-full md:w-auto justify-center md:justify-end items-center flex-wrap">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard' %}" class="hover:text-blue-200 py-2 font-medium">Dashboard</a>
+                    <a href="{% url 'analytics' %}" class="hover:text-blue-200 py-2 font-medium">Keuangan</a>
+                    <a href="{% url 'tambah_order' %}" class="bg-white text-blue-800 px-4 py-2 rounded font-bold hover:bg-gray-200 text-sm flex items-center shadow-sm">
+                        + Terima Order
+                    </a>
+                    
+                    <!-- User Info & Logout -->
+                    <div class="flex items-center gap-2 border-l pl-4 ml-4">
+                        <div class="text-sm">
+                            <div class="font-semibold">{{ user.username }}</div>
+                            <div class="text-xs text-blue-200">
+                                {% if user.groups.all %}
+                                    {{ user.groups.all|first }}
+                                {% else %}
+                                    No Role
+                                {% endif %}
+                            </div>
+                        </div>
+                        <a href="{% url 'logout' %}" class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm font-medium ml-2">
+                            Logout
+                        </a>
+                    </div>
+                {% else %}
+                    <a href="{% url 'login' %}" class="bg-white text-blue-800 px-4 py-2 rounded font-bold hover:bg-gray-200">
+                        Login
+                    </a>
+                {% endif %}
             </div>
 
         </div>
